@@ -185,7 +185,10 @@ def writeGdbStackTrace(corefile, binary):
 
 def writeDbxStackTrace(corefile, binary):
     cmdArgs = [ "dbx", "-f", "-q", "-c", "where; quit", binary, corefile ]
-    proc = subprocess.Popen(cmdArgs, stdin=open(os.devnull), stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    proc = subprocess.Popen(cmdArgs, 
+                            stdin=open(os.devnull), 
+                            stdout=subprocess.PIPE, 
+                            stderr=subprocess.PIPE)
     output, errors = proc.communicate()
     signalDesc, summaryLine, stackLines = parseDbxOutput(output)
     if summaryLine:

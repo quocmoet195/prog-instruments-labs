@@ -82,8 +82,11 @@ def runXvfb(logDir, extraArgs):
     displayNum = getDisplayNumber()
     logFile = os.path.join(logDir, "Xvfb." + displayNum + "." + gethostname())
     startArgs = [ "Xvfb", "-ac" ] + extraArgs + [ "-audit", "2", ":" + displayNum ]
-    proc = subprocess.Popen(startArgs, preexec_fn=ignoreSignals,
-                            stdout=open(logFile, "w"), stderr=subprocess.STDOUT, stdin=open(os.devnull))
+    proc = subprocess.Popen(startArgs, 
+                            preexec_fn=ignoreSignals,
+                            stdout=open(logFile, "w"), 
+                            stderr=subprocess.STDOUT, 
+                            stdin=open(os.devnull))
     try:
         signal.signal(signal.SIGUSR1, connectionComplete)
         signal.signal(signal.SIGALRM, connectionFailed)
