@@ -12,30 +12,38 @@ import os
 import signal
 import subprocess
 import sys
+
 from socket import gethostname
 
 MAX_DISPLAY = 32768
 Xvfb_ready = False
 
+
 class ConnectionComplete:
     pass
+
 
 class ConnectionTimeout:
     pass
     
+
 def setReadyFlag(self, *args): # pragma: no cover - only here to deal with pathological and probably impossible race condition
     global Xvfb_ready
     Xvfb_ready = True
 
+
 def connectionComplete(self, *args):
     raise ConnectionComplete()
+
 
 def connectionFailed(self, *args):
     raise ConnectionTimeout()
 
+
 def ignoreSignals():
     for signum in [ signal.SIGUSR1, signal.SIGUSR2, signal.SIGXCPU ]:
         signal.signal(signum, signal.SIG_IGN)
+
 
 def getDisplayNumber():
     # We use the device of making the display number match our process ID (mod 32768)!
@@ -43,10 +51,12 @@ def getDisplayNumber():
     # Display numbers up to 32768 seem to be allowed, which is less than most process IDs on systems I've observed...
     return str(os.getpid() % MAX_DISPLAY)
 
+
 def getLockFiles(num):
     lockFile = "/tmp/.X" + num + "-lock"
     xFile = "/tmp/.X11-unix/X" + num
     return [ lockFile, xFile ]
+
 
 def cleanLeakedLockFiles(displayNum):
     # Xvfb sometimes leaves lock files lying around, clean up
@@ -57,12 +67,14 @@ def cleanLeakedLockFiles(displayNum):
             except: # pragma: no cover - pathological case of ending up in race condition with Xvfb
                 pass
 
+
 def writeAndWait(text, proc, displayNum):
     ignoreSignals()
     sys.stdout.write(text + "\n")
     sys.stdout.flush()
     proc.wait()
     cleanLeakedLockFiles(displayNum)
+
 
 def runXvfb(logDir, extraArgs):
     ignoreSignals()

@@ -1,6 +1,6 @@
-
 import os
 import sys
+
 
 def trySetupCoverage(): # pragma: no cover - can hardly measure coverage here :)
     try:
@@ -17,12 +17,14 @@ def loadTestCustomize():
     except ImportError:
         pass
 
+
 def trySetupCaptureMock():
     try:
         import capturemock
         capturemock.process_startup() # doesn't do anything unless CAPTUREMOCK_PROCESS_START is set
     except Exception:
         pass
+
 
 def loadRealSiteCustomize(fileName): # pragma: no cover - coverage not set up yet
     # must do this before setting up coverage as real sitecustomize might
@@ -39,6 +41,7 @@ def loadRealSiteCustomize(fileName): # pragma: no cover - coverage not set up ye
             imp.load_module("sitecustomize", file, pathname, description)
     except ImportError:
         pass
+
 
 loadRealSiteCustomize(__file__) # pragma: no cover - coverage not set up yet
 trySetupCoverage() # pragma: no cover - coverage not set up yet

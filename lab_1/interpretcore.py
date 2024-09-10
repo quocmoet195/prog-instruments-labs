@@ -6,6 +6,7 @@ import subprocess
 
 from tempfile import mktemp
 
+
 def interpretCore(corefile):
     if os.path.getsize(corefile) == 0:
         details = "Core file of zero size written - Stack trace not produced for crash\nCheck your coredumpsize limit"
@@ -28,6 +29,7 @@ def interpretCore(corefile):
             pass # If DBX isn't installed, just return the GDB details anyway
     return summary, details, binary
 
+
 def getLocalName(corefile):
     data = os.popen("file " + corefile).readline()
     parts = data.split("'")
@@ -40,6 +42,7 @@ def getLocalName(corefile):
             return newParts[-1]
         else:
             return ""
+
 
 def getLastFileName(corefile):
     # Yes, we know this is horrible. Does anyone know a better way of getting the binary out of a core file???
@@ -64,6 +67,7 @@ def getLastFileName(corefile):
     else:
         return ""
     
+
 def getBinary(corefile):
     binary = getLastFileName(corefile)
     if os.path.isfile(binary):
@@ -80,12 +84,14 @@ def getBinary(corefile):
             pass
     return binary
 
+
 def writeCmdFile():
     fileName = mktemp("coreCommands.gdb")
     file = open(fileName, "w")
     file.write("bt\n")
     file.close()
     return fileName
+
 
 def parseGdbOutput(output):
     summaryLine = ""
@@ -111,8 +117,8 @@ def parseGdbOutput(output):
         
     if len(stackLines) > 1:
         signalDesc += " in " + getGdbMethodName(stackLines[0])
-
     return signalDesc, summaryLine, stackLines    
+
 
 def parseDbxOutput(output):
     summaryLine = ""
@@ -133,8 +139,8 @@ def parseDbxOutput(output):
 
     if len(stackLines) > 1:
         signalDesc += " in " + stackLines[0].strip()
-        
     return signalDesc, summaryLine, stackLines    
+
 
 def getGdbMethodName(line):
     endPos = line.rfind("(")
@@ -143,6 +149,7 @@ def getGdbMethodName(line):
     if pointerPos != -1:
         methodName = methodName[:pointerPos]
     return methodName.strip()
+
 
 def parseFailure(errMsg, debugger):
     summary = "Parse failure on " + debugger + " output"
@@ -175,6 +182,7 @@ def writeGdbStackTrace(corefile, binary):
     else:
         return parseFailure(errors, "GDB")
 
+
 def writeDbxStackTrace(corefile, binary):
     cmdArgs = [ "dbx", "-f", "-q", "-c", "where; quit", binary, corefile ]
     proc = subprocess.Popen(cmdArgs, stdin=open(os.devnull), stdout=subprocess.PIPE, stderr=subprocess.PIPE)
@@ -184,6 +192,7 @@ def writeDbxStackTrace(corefile, binary):
         return assembleInfo(signalDesc, summaryLine, stackLines, "DBX")
     else:
         return parseFailure(errors, "DBX")
+
 
 def printCoreInfo(corefile):
     compression = corefile.endswith(".Z")
@@ -199,6 +208,7 @@ def printCoreInfo(corefile):
     print details
     if compression:
         os.system("compress " + corefile)
+
 
 if len(sys.argv) != 2:
     print "Usage: interpretcore.py <corefile>"
