@@ -26,7 +26,7 @@ def interpretCore(corefile):
             else:
                 return dbxSummary, dbxDetails, binary
         except OSError:
-            pass # If DBX isn't installed, just return the GDB details anyway
+            pass  # If DBX isn't installed, just return the GDB details anyway
     return summary, details, binary
 
 
@@ -34,7 +34,7 @@ def getLocalName(corefile):
     data = os.popen("file " + corefile).readline()
     parts = data.split("'")
     if len(parts) == 3:
-        return parts[1].split()[0] # don't pass arguments along, only want program name
+        return parts[1].split()[0]  # don't pass arguments along, only want program name
     else:
         newParts = data.split()
         if len(newParts) > 2 and newParts[-2].endswith(","):

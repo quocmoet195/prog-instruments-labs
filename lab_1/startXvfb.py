@@ -27,7 +27,7 @@ class ConnectionTimeout:
     pass
     
 
-def setReadyFlag(self, *args): # pragma: no cover - only here to deal with pathological and probably impossible race condition
+def setReadyFlag(self, *args):  # pragma: no cover - only here to deal with pathological and probably impossible race condition
     global Xvfb_ready
     Xvfb_ready = True
 
@@ -64,7 +64,7 @@ def cleanLeakedLockFiles(displayNum):
         if os.path.isfile(lockFile):
             try:
                 os.remove(lockFile)
-            except: # pragma: no cover - pathological case of ending up in race condition with Xvfb
+            except:  # pragma: no cover - pathological case of ending up in race condition with Xvfb
                 pass
 
 
@@ -88,7 +88,7 @@ def runXvfb(logDir, extraArgs):
         signal.signal(signal.SIGUSR1, connectionComplete)
         signal.signal(signal.SIGALRM, connectionFailed)
         if not Xvfb_ready:
-            signal.alarm(int(os.getenv("TEXTTEST_XVFB_WAIT", 15))) # Time to wait for Xvfb to set up connections
+            signal.alarm(int(os.getenv("TEXTTEST_XVFB_WAIT", 15)))  # Time to wait for Xvfb to set up connections
             signal.pause() 
     except ConnectionTimeout:
         # Kill it and tell TextTest we timed out. It will then start a new startXvfb.py process, with a new process ID
@@ -96,7 +96,7 @@ def runXvfb(logDir, extraArgs):
         os.kill(proc.pid, signal.SIGTERM)
         return writeAndWait("Time Out!", proc, displayNum)
     except ConnectionComplete:
-        signal.alarm(0) # cancel any alarms that were previously set up!
+        signal.alarm(0)  # cancel any alarms that were previously set up!
 
     writeAndWait(displayNum + "," + str(proc.pid), proc, displayNum)
     
