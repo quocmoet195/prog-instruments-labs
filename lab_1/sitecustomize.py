@@ -1,5 +1,6 @@
 
-import sys, os
+import os
+import sys
 
 def trySetupCoverage(): # pragma: no cover - can hardly measure coverage here :)
     try:

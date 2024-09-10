@@ -8,7 +8,10 @@
 #   way to tell these signals from ordinary job control
 # - Clean up after Xvfb as it leaks lock files from time to time.
 
-import os, signal, sys, subprocess
+import os
+import signal
+import subprocess
+import sys
 from socket import gethostname
 
 MAX_DISPLAY = 32768

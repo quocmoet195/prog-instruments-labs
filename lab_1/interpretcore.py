@@ -1,6 +1,9 @@
 #!/usr/bin/env python
 
-import os, sys, subprocess
+import os
+import sys
+import subprocess
+
 from tempfile import mktemp
 
 def interpretCore(corefile):
