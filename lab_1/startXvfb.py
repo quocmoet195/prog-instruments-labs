@@ -28,24 +28,39 @@ class ConnectionTimeout:
     
 
 def setReadyFlag(self, *args):  # pragma: no cover - only here to deal with pathological and probably impossible race condition
+    """
+    Sets the global Xvfb_ready flag when the SIGUSR1 signal is received.
+    """
     global Xvfb_ready
     Xvfb_ready = True
 
 
 def connectionComplete(self, *args):
+    """
+    Signal handler to raise a ConnectionComplete exception.
+    """
     raise ConnectionComplete()
 
 
 def connectionFailed(self, *args):
+    """
+    Signal handler to raise a ConnectionTimeout exception when the SIGALRM signal is received.
+    """
     raise ConnectionTimeout()
 
 
 def ignoreSignals():
+    """
+    Ignores specific signals (SIGUSR1, SIGUSR2, SIGXCPU) to prevent Xvfb from interfering with the parent process when it sends signals during its lifetime.
+    """
     for signum in [ signal.SIGUSR1, signal.SIGUSR2, signal.SIGXCPU ]:
         signal.signal(signum, signal.SIG_IGN)
 
 
 def getDisplayNumber():
+    """
+    Generates a display number for Xvfb using the process ID modulo 32768.
+    """
     # We use the device of making the display number match our process ID (mod 32768)!
     # And we hope that works :) Should prevent clashes with others using the same strategy anyway
     # Display numbers up to 32768 seem to be allowed, which is less than most process IDs on systems I've observed...
@@ -53,12 +68,22 @@ def getDisplayNumber():
 
 
 def getLockFiles(num):
+    """
+    Constructs paths to lock files associated with a given display number.
+    Args:
+        num (str): The display number.
+    """
     lockFile = "/tmp/.X" + num + "-lock"
     xFile = "/tmp/.X11-unix/X" + num
     return [ lockFile, xFile ]
 
 
 def cleanLeakedLockFiles(displayNum):
+    """
+    Cleans up any lock files left behind by Xvfb, which sometimes fails to remove them.
+    Args:
+        displayNum (str): The display number whose lock files need to be cleaned.
+    """
     # Xvfb sometimes leaves lock files lying around, clean up
     for lockFile in getLockFiles(displayNum):
         if os.path.isfile(lockFile):
@@ -69,6 +94,13 @@ def cleanLeakedLockFiles(displayNum):
 
 
 def writeAndWait(text, proc, displayNum):
+    """
+    Writes output to stdout and waits for the Xvfb process to finish, then cleans up.
+    Args:
+        text (str): The text to write to stdout.
+        proc (Popen): The Xvfb subprocess.
+        displayNum (str): The display number associated with the Xvfb instance.
+    """
     ignoreSignals()
     sys.stdout.write(text + "\n")
     sys.stdout.flush()
@@ -77,6 +109,12 @@ def writeAndWait(text, proc, displayNum):
 
 
 def runXvfb(logDir, extraArgs):
+    """
+    Runs the Xvfb process with the specified arguments and handles signal-based readiness.
+    Args:
+        logDir: The directory where the Xvfb log file will be stored.
+        extraArgs: Additional arguments to pass to the Xvfb command.
+    """
     ignoreSignals()
     signal.signal(signal.SIGUSR1, setReadyFlag)
     displayNum = getDisplayNumber()
@@ -105,4 +143,7 @@ def runXvfb(logDir, extraArgs):
     
     
 if __name__ == "__main__":
+    """
+    Main entry point for running the Xvfb wrapper script.
+    """
     runXvfb(sys.argv[1], sys.argv[2:])

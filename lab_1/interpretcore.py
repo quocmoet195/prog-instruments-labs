@@ -8,6 +8,11 @@ from tempfile import mktemp
 
 
 def interpretCore(corefile):
+    """
+    Interprets the core file to extract stack trace information.
+    Args:
+        corefile: The path to the core file.
+    """
     if os.path.getsize(corefile) == 0:
         details = "Core file of zero size written - Stack trace not produced for crash\nCheck your coredumpsize limit"
         return "Empty core file", details, None
@@ -31,6 +36,11 @@ def interpretCore(corefile):
 
 
 def getLocalName(corefile):
+    """
+    Determine the binary file name from the core file.
+    Args:
+        corefile: The path to the core file.
+    """
     data = os.popen("file " + corefile).readline()
     parts = data.split("'")
     if len(parts) == 3:
@@ -45,6 +55,11 @@ def getLocalName(corefile):
 
 
 def getLastFileName(corefile):
+    """
+    Extracts the last valid binary file name.
+    Args:
+        corefile: The path to the core file.
+    """
     # Yes, we know this is horrible. Does anyone know a better way of getting the binary out of a core file???
     # Unfortunately running gdb is not the answer, because it truncates the data...
     localName = getLocalName(corefile)
@@ -69,6 +84,11 @@ def getLastFileName(corefile):
     
 
 def getBinary(corefile):
+    """
+    Retrieves the binary associated with the core file.
+    Args:
+        corefile: The path to the core file.
+    """
     binary = getLastFileName(corefile)
     if os.path.isfile(binary):
         return binary
@@ -86,6 +106,9 @@ def getBinary(corefile):
 
 
 def writeCmdFile():
+    """
+    Creates a temporary GDB command file.
+    """
     fileName = mktemp("coreCommands.gdb")
     file = open(fileName, "w")
     file.write("bt\n")
@@ -94,6 +117,11 @@ def writeCmdFile():
 
 
 def parseGdbOutput(output):
+    """
+    Parses the output from GDB to extract stack trace information.
+    Args:
+        output (str): The output from GDB.
+    """
     summaryLine = ""
     signalDesc = ""
     stackLines = []
@@ -121,6 +149,11 @@ def parseGdbOutput(output):
 
 
 def parseDbxOutput(output):
+    """
+    Parses the output from DBX to extract stack trace information.
+    Args:
+        output (str): The output from DBX.
+    """
     summaryLine = ""
     signalDesc = ""
     stackLines = []
@@ -137,12 +170,17 @@ def parseDbxOutput(output):
             stackLines.append(methodName)
         prevLine = line
 
-    if len(stackLines) > 1:
+    if len(stackLines) > 1:    
         signalDesc += " in " + stackLines[0].strip()
     return signalDesc, summaryLine, stackLines    
 
 
 def getGdbMethodName(line):
+    """
+    Extracts the method name from a GDB stack trace line.
+    Args:
+        line (str): A line from the GDB stack trace.
+    """
     endPos = line.rfind("(")
     methodName = line[:endPos]
     pointerPos = methodName.find("+0")
@@ -152,6 +190,12 @@ def getGdbMethodName(line):
 
 
 def parseFailure(errMsg, debugger):
+    """
+    Handles the parsing failure of GDB or DBX output.
+    Args:
+        errMsg (str): The error message from the debugger.
+        debugger (str): The debugger being used (GDB or DBX).
+    """
     summary = "Parse failure on " + debugger + " output"
     if len(errMsg) > 50000:
         return summary, "Over 50000 error characters printed - suspecting binary output"
@@ -160,6 +204,14 @@ def parseFailure(errMsg, debugger):
 
 
 def assembleInfo(signalDesc, summaryLine, stackLines, debugger):
+    """
+    Assembles the stack trace information into a formatted summary and details.
+    Args:
+        signalDesc (str): The signal description.
+        summaryLine (str): The summary line from the debugger.
+        stackLines (list): The list of stack trace lines.
+        debugger (str): The debugger used (GDB or DBX).
+    """
     summary = signalDesc
     details = summaryLine + "\nStack trace from " + debugger + " :\n" + \
               "\n".join(stackLines[:100])
@@ -171,6 +223,12 @@ def assembleInfo(signalDesc, summaryLine, stackLines, debugger):
 
 
 def writeGdbStackTrace(corefile, binary):
+    """
+    Generates the stack trace using GDB.
+    Args:
+        corefile (str): The path to the core file.
+        binary (str): The path to the binary file.
+    """
     fileName = writeCmdFile()
     cmdArgs = [ "gdb", "-q", "-batch", "-x", fileName, binary, corefile ]
     proc = subprocess.Popen(cmdArgs, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
@@ -184,6 +242,12 @@ def writeGdbStackTrace(corefile, binary):
 
 
 def writeDbxStackTrace(corefile, binary):
+    """
+    Generates the stack trace using DBX.
+    Args:
+        corefile (str): The path to the core file.
+        binary (str): The path to the binary file.
+    """
     cmdArgs = [ "dbx", "-f", "-q", "-c", "where; quit", binary, corefile ]
     proc = subprocess.Popen(cmdArgs, 
                             stdin=open(os.devnull), 
@@ -198,6 +262,11 @@ def writeDbxStackTrace(corefile, binary):
 
 
 def printCoreInfo(corefile):
+    """
+    Prints the core file information and stack trace.
+    Args:
+        corefile (str): The path to the core file.
+    """
     compression = corefile.endswith(".Z")
     if compression:
         os.system("uncompress " + corefile)
