@@ -13,12 +13,16 @@ def interpretCore(corefile):
         corefile: The path to the core file.
     """
     if os.path.getsize(corefile) == 0:
-        details = "Core file of zero size written - Stack trace not produced for crash\nCheck your coredumpsize limit"
+        details = "Core file of zero size written - \
+        Stack trace not produced for crash\n\
+        Check your coredumpsize limit"
         return "Empty core file", details, None
     
     binary = getBinary(corefile)
     if not os.path.isfile(binary):
-        details = "Could not find binary name '" + binary + "' from core file : Stack trace not produced for crash"
+        details = "Could not find binary name '" + \
+            binary + "' from core file :\
+        Stack trace not produced for crash"
         return "No binary found from core", details, None
 
     summary, details = writeGdbStackTrace(corefile, binary)
@@ -26,7 +30,10 @@ def interpretCore(corefile):
         try:
             dbxSummary, dbxDetails = writeDbxStackTrace(corefile, binary)
             if "Parse failure" in dbxSummary:
-                return "Parse failure from both GDB and DBX", details + dbxDetails, binary
+                return "Parse failure from both GDB and DBX",\
+                    details + \
+                    dbxDetails, \
+                    binary
             else:
                 return dbxSummary, dbxDetails, binary
         except OSError:
@@ -69,7 +76,9 @@ def getLastFileName(corefile):
     if not os.path.isabs(localName):
         localRegexp = "/.*/" + localName
 
-    possibleNames = os.popen("strings " + corefile + " | grep '^" + localRegexp + "'").readlines()
+    possibleNames = os.popen("strings " + corefile + \
+                             " | grep '^" + localRegexp + "'"
+                             ).readlines()
     possibleNames.reverse()
     for name in possibleNames:
         name = name.strip()
@@ -162,7 +171,8 @@ def parseDbxOutput(output):
         if line.find("program terminated") != -1:
             summaryLine = stripLine
             signalDesc = summaryLine.split("(")[-1].replace(")", "")
-        if (stripLine.startswith("[") or stripLine.startswith("=>[")) and line != prevLine:
+        if (stripLine.startswith("[") or \
+            stripLine.startswith("=>[")) and line != prevLine:
             startPos = line.find("]") + 2
             endPos = line.rfind("(")
             methodName = line[startPos:endPos]
@@ -199,7 +209,11 @@ def parseFailure(errMsg, debugger):
     if len(errMsg) > 50000:
         return summary, "Over 50000 error characters printed - suspecting binary output"
     else:
-        return summary, debugger + " backtrace command failed : Stack trace not produced for crash\nErrors from " + debugger + ":\n" + errMsg
+        return summary, debugger + \
+            " backtrace command failed : Stack trace not produced for crash\n\
+            Errors from " + \
+            debugger + ":\n" + \
+            errMsg
 
 
 def assembleInfo(signalDesc, summaryLine, stackLines, debugger):
@@ -230,7 +244,8 @@ def writeGdbStackTrace(corefile, binary):
     """
     fileName = writeCmdFile()
     cmdArgs = [ "gdb", "-q", "-batch", "-x", fileName, binary, corefile ]
-    proc = subprocess.Popen(cmdArgs, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    proc = subprocess.Popen(cmdArgs, stdout=subprocess.PIPE, \
+                            stderr=subprocess.PIPE)
     output, errors = proc.communicate()
     signalDesc, summaryLine, stackLines = parseGdbOutput(output)
     os.remove(fileName)

@@ -50,7 +50,8 @@ def connectionFailed(self, *args):
 
 def ignoreSignals():
     """
-    Ignores specific signals (SIGUSR1, SIGUSR2, SIGXCPU) to prevent Xvfb from interfering with the parent process when it sends signals during its lifetime.
+    Ignores specific signals (SIGUSR1, SIGUSR2, SIGXCPU) to prevent Xvfb from\
+    interfering with the parent process when it sends signals during its lifetime.
     """
     for signum in [ signal.SIGUSR1, signal.SIGUSR2, signal.SIGXCPU ]:
         signal.signal(signum, signal.SIG_IGN)
@@ -79,7 +80,8 @@ def getLockFiles(num):
 
 def cleanLeakedLockFiles(displayNum):
     """
-    Cleans up any lock files left behind by Xvfb, which sometimes fails to remove them.
+    Cleans up any lock files left behind by Xvfb, \
+    which sometimes fails to remove them.
     Args:
         displayNum (str): The display number whose lock files need to be cleaned.
     """
@@ -94,7 +96,8 @@ def cleanLeakedLockFiles(displayNum):
 
 def writeAndWait(text, proc, displayNum):
     """
-    Writes output to stdout and waits for the Xvfb process to finish, then cleans up.
+    Writes output to stdout and waits for the Xvfb process to finish, \
+    then cleans up.
     Args:
         text (str): The text to write to stdout.
         proc (Popen): The Xvfb subprocess.
@@ -109,7 +112,8 @@ def writeAndWait(text, proc, displayNum):
 
 def runXvfb(logDir, extraArgs):
     """
-    Runs the Xvfb process with the specified arguments and handles signal-based readiness.
+    Runs the Xvfb process with the specified arguments and\
+    handles signal-based readiness.
     Args:
         logDir: The directory where the Xvfb log file will be stored.
         extraArgs: Additional arguments to pass to the Xvfb command.
@@ -118,7 +122,8 @@ def runXvfb(logDir, extraArgs):
     signal.signal(signal.SIGUSR1, setReadyFlag)
     displayNum = getDisplayNumber()
     logFile = os.path.join(logDir, "Xvfb." + displayNum + "." + gethostname())
-    startArgs = [ "Xvfb", "-ac" ] + extraArgs + [ "-audit", "2", ":" + displayNum ]
+    startArgs = [ "Xvfb", "-ac" ] +\
+       extraArgs + [ "-audit", "2", ":" + displayNum ]
     proc = subprocess.Popen(startArgs, 
                             preexec_fn=ignoreSignals,
                             stdout=open(logFile, "w"), 

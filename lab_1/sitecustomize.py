@@ -48,12 +48,14 @@ def loadRealSiteCustomize(fileName): # pragma: no cover - coverage not set up ye
     myDir = os.path.dirname(fileName)
     pos = sys.path.index(myDir)
     try:
-        file, pathname, description = imp.find_module("sitecustomize", sys.path[pos + 1:])
+        file, pathname, description = imp.find_module("sitecustomize", \
+                                                      sys.path[pos + 1:])
         if os.path.basename(os.path.dirname(pathname)) == "traffic_intercepts":
             # For the self-tests: don't load another copy ourselves recursively
             loadRealSiteCustomize(pathname)
         else:
-            imp.load_module("sitecustomize", file, pathname, description)
+            imp.load_module("sitecustomize", file, \
+                            pathname, description)
     except ImportError:
         pass
 
