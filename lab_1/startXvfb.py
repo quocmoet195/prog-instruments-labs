@@ -12,7 +12,6 @@ import os
 import signal
 import subprocess
 import sys
-
 from socket import gethostname
 
 MAX_DISPLAY = 32768
