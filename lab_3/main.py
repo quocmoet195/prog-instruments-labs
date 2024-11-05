@@ -2,7 +2,6 @@
 import re
 from checksum import calculate_checksum, serialize_result
 
-
 MY_VARIANT = 83
 PATTERNS = {
     "email": "^[\\w._%+-]+@[\\w.-]+\.[a-zA-Z]{2,}$",
@@ -16,3 +15,21 @@ PATTERNS = {
     "locale_code": "^[a-z]{2,3}(-[a-z]{2})?$",
     "time": "^([0-1]\\d|2[0-3]):[0-5]\\d:[0-5]\\d\\.\\d{1,6}$"
 }
+
+
+def check_line(line: list[str]) -> bool:
+    """
+    Validates a list of values against predefined regex patterns.
+
+    Args:
+        line (list[str]): A list of strings to be validated, where each string corresponds
+                          to a specific field in the order defined by PATTERNS.
+
+    Returns:
+        bool: True if all values in `line` match their respective patterns in PATTERNS;
+              False if any value does not match.
+    """
+    for i, key in enumerate(PATTERNS.keys()):
+        if not re.match(PATTERNS[key], line[i]):
+            return False
+    return True
