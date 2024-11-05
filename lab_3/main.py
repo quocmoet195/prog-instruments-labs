@@ -17,6 +17,25 @@ PATTERNS = {
 }
 
 
+def read_file_csv(name_file: str) -> list:
+    """
+    Reads a CSV file with a specified delimiter and encoding, returning its contents as a list of rows.
+    
+    Parameters:
+        name_file (str): The name or path of the CSV file to read.
+    
+    Returns:
+        list: A list of rows from the CSV file, where each row is represented as a list of strings. 
+            The first row (header) is excluded from the returned data.
+    """
+    data = []
+    with open(name_file, "r", encoding="utf-16") as f:
+        data_reader = csv.reader(f, delimiter=";")
+        for line in data_reader:
+            data.append(line)
+        data.pop(0)
+    return data
+
 def check_line(line: list[str]) -> bool:
     """
     Validates a list of values against predefined regex patterns.
