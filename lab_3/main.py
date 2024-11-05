@@ -52,3 +52,19 @@ def check_line(line: list[str]) -> bool:
         if not re.match(PATTERNS[key], line[i]):
             return False
     return True
+
+def find_incorrect_data(data: list) -> list:
+    """
+    Find the indices of rows in the given data that do not pass the check_line function.
+
+    Args:
+        data (list): A list of rows to check.
+
+    Returns:
+        list: A list of indices where the rows failed the check.
+    """
+    indexes = []
+    for index in range(len(data)):
+        if not check_line(data[index]):
+            indexes.append(index)
+    return indexes
