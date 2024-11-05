@@ -68,3 +68,9 @@ def find_incorrect_data(data: list) -> list:
         if not check_line(data[index]):
             indexes.append(index)
     return indexes
+
+if __name__=='__main__':
+    data=read_file_csv('83.csv')
+    incorrect_indexes=find_incorrect_data(data)
+    hash_sum=calculate_checksum(incorrect_indexes)
+    serialize_result(MY_VARIANT, hash_sum)
