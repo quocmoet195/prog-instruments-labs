@@ -39,7 +39,7 @@ class Plateau:
     max_y : int
     def __init__(self, max_x, max_y):
         if max_x <= 0 and max_y <= 0:
-            logging.error(f'Cannot construct zero or negative sized plateau')
+            logging.error('Cannot construct zero or negative sized plateau')
         self.max_x = max_x
         self.max_y = max_y
  
