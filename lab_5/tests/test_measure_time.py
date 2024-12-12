@@ -6,6 +6,7 @@ sys.path.append(os.path.dirname(os.path.abspath(__file__)) + "/..")
 from unittest.mock import patch
 from measure_time import measure_time
 
+
 @patch('measure_time.create_card_number')
 def test_measure_time(mock_create_card_number):
     """
